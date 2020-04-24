@@ -23,6 +23,7 @@ require (
 	github.com/ogier/pflag v0.0.1 // indirect
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
+	github.com/ory/fosite v0.31.2
 	github.com/otiai10/copy v1.1.1
 	github.com/pquerna/otp v1.2.0
 	github.com/simia-tech/crypt v0.4.2
