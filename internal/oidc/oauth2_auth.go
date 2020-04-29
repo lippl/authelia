@@ -5,14 +5,16 @@ import (
 	"log"
 
 	"github.com/authelia/authelia/internal/logging"
-	"github.com/valyala/fasthttp"
+	"github.com/authelia/authelia/internal/middlewares"
 )
 
-func authEndpoint(req *fasthttp.RequestCtx) {
-	rw := req.Response.BodyWriter()
+func AuthEndpointGet(req *middlewares.AutheliaCtx) {
+	netReq := req.NetHTTPCtx().GetRequest()
+
+	rw := req.NetHTTPCtx().ResponseWriter()
 	// Let's create an AuthorizeRequest object!
 	// It will analyze the request and extract important information like scopes, response type and others.
-	ar, err := oauth2.NewAuthorizeRequest(req, req.Request)
+	ar, err := oauth2.NewAuthorizeRequest(req, &netReq)
 	if err != nil {
 		logging.Logger().Errorf("Error occurred in NewAuthorizeRequest: %+v", err)
 		oauth2.WriteAuthorizeError(rw, ar, err)
@@ -27,7 +29,7 @@ func authEndpoint(req *fasthttp.RequestCtx) {
 
 	// Normally, this would be the place where you would check if the user is logged in and gives his consent.
 	// We're simplifying things and just checking if the request includes a valid username and password
-	req.ParseForm()
+	/* req.ParseForm()
 	if req.PostForm.Get("username") != "peter" {
 		rw.Header().Set("Content-Type", "text/html; charset=utf-8")
 		rw.Write([]byte(`<h1>Login page</h1>`))
@@ -49,6 +51,7 @@ func authEndpoint(req *fasthttp.RequestCtx) {
 	for _, scope := range req.PostForm["scopes"] {
 		ar.GrantScope(scope)
 	}
+	*/
 
 	// Now that the user is authorized, we set up a session:
 	mySessionData := newSession("peter")
@@ -77,7 +80,7 @@ func authEndpoint(req *fasthttp.RequestCtx) {
 	// Now we need to get a response. This is the place where the AuthorizeEndpointHandlers kick in and start processing the request.
 	// NewAuthorizeResponse is capable of running multiple response type handlers which in turn enables this library
 	// to support open id connect.
-	response, err := oauth2.NewAuthorizeResponse(ctx, ar, mySessionData)
+	response, err := oauth2.NewAuthorizeResponse(req, ar, mySessionData)
 
 	// Catch any errors, e.g.:
 	// * unknown client
@@ -88,6 +91,7 @@ func authEndpoint(req *fasthttp.RequestCtx) {
 		oauth2.WriteAuthorizeError(rw, ar, err)
 		return
 	}
+	fmt.Println(response)
 
 	// Last but not least, send the response!
 	oauth2.WriteAuthorizeResponse(rw, ar, response)

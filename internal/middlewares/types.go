@@ -63,6 +63,9 @@ type RequestHandler = func(*AutheliaCtx)
 // Middleware represent an Authelia middleware.
 type Middleware = func(RequestHandler) RequestHandler
 
+// RequestHandlerBridge bridge a AutheliaCtx handle to a RequestHandler handler
+type RequestHandlerBridge = func(RequestHandler) fasthttp.RequestHandler
+
 // IdentityVerificationStartArgs represent the arguments used to customize the starting phase
 // of the identity verification process.
 type IdentityVerificationStartArgs struct {

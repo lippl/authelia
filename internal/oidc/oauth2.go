@@ -3,27 +3,64 @@ package oidc
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"fmt"
 	"time"
 
+	"github.com/authelia/authelia/internal/middlewares"
 	"github.com/fasthttp/router"
+	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/valyala/fasthttp"
 )
 
-func RegisterHandlers(router *router.Router) {
+func RegisterHandlers(router *router.Router, autheliaMiddleware middlewares.RequestHandlerBridge) {
 	// Set up oauth2 endpoints. You could also use gorilla/mux or any other router.
-	router.GET("/api/oauth2/auth", authEndpoint)
+	router.GET("/api/oauth2/auth", autheliaMiddleware(AuthEndpointGet))
 	// router.GET("/api/oauth2/token", tokenEndpoint)
+	router.GET("/api/oauth2/callback", func(req *fasthttp.RequestCtx) {
+		fmt.Println("CALLBACK")
+	})
 
 	// revoke tokens
 	// http.HandleFunc("/oauth2/revoke", revokeEndpoint)
 	// http.HandleFunc("/oauth2/introspect", introspectionEndpoint)
 }
 
+func NewStore() *storage.MemoryStore {
+	return &storage.MemoryStore{
+		IDSessions: make(map[string]fosite.Requester),
+		Clients: map[string]fosite.Client{
+			"authelia": &fosite.DefaultClient{
+				ID:            "authelia",
+				Secret:        []byte(`$2a$10$IxMdI6d.LIRZPpSfEwNoeu4rY3FhDREsxFJXikcgdRRAStxUlsuEO`), // = "foobar"
+				RedirectURIs:  []string{"https://login.example.com:8080/api/oauth2/callback"},
+				ResponseTypes: []string{"code"},
+				GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+				Scopes:        []string{"test", "openid"},
+			},
+		},
+		Users: map[string]storage.MemoryUserRelation{
+			"peter": {
+				// This store simply checks for equality, a real storage implementation would obviously use
+				// a hashing algorithm for encrypting the user password.
+				Username: "peter",
+				Password: "secret",
+			},
+		},
+		AuthorizeCodes:         map[string]storage.StoreAuthorizeCode{},
+		AccessTokens:           map[string]fosite.Requester{},
+		RefreshTokens:          map[string]fosite.Requester{},
+		PKCES:                  map[string]fosite.Requester{},
+		AccessTokenRequestIDs:  map[string]string{},
+		RefreshTokenRequestIDs: map[string]string{},
+	}
+}
+
 // This is an exemplary storage instance. We will add a client and a user to it so we can use these later on.
-var store = storage.NewExampleStore()
+var store = NewStore()
 
 var config = new(compose.Config)
 

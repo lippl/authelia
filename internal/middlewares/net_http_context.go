@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func (n NetHTTPCtx) ResponseWriter() *NetHTTPResponseWriter {
+func (n NetHTTPCtx) ResponseWriter() http.ResponseWriter {
 	if n.responseWriter == nil {
 		n.responseWriter = &NetHTTPResponseWriter{AutheliaCtx: n.AutheliaCtx}
 	}
@@ -47,7 +47,7 @@ func (n *NetHTTPCtx) GetRequest() http.Request {
 	return request
 }
 
-func (wr *NetHTTPResponseWriter) Headers() http.Header {
+func (wr *NetHTTPResponseWriter) Header() http.Header {
 	if wr.headers == nil {
 		wr.headers = make(http.Header)
 	}
@@ -64,9 +64,11 @@ func (wr *NetHTTPResponseWriter) Write(data []byte) (int, error) {
 	wr.AutheliaCtx.SetStatusCode(wr.StatusCode())
 	return wr.AutheliaCtx.RequestCtx.Write(data)
 }
+
 func (wr *NetHTTPResponseWriter) WriteHeader(statusCode int) {
 	wr.statusCode = statusCode
 }
+
 func (wr *NetHTTPResponseWriter) StatusCode() int {
 	if wr.statusCode == 0 {
 		return http.StatusOK

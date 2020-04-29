@@ -114,7 +114,7 @@ func StartServer(configuration schema.Configuration, providers middlewares.Provi
 
 	router.NotFound = ServeIndex(publicDir)
 
-	oidc.RegisterHandlers(router)
+	oidc.RegisterHandlers(router, autheliaMiddleware)
 
 	server := &fasthttp.Server{
 		Handler: middlewares.LogRequestMiddleware(router.Handler),
