@@ -13,6 +13,7 @@ const userPreferencesTableName = "user_preferences"
 const identityVerificationTokensTableName = "identity_verification_tokens"
 const totpSecretsTableName = "totp_secrets"
 const u2fDeviceHandlesTableName = "u2f_devices"
+const duoDevicesTableName = "duo_devices"
 const authenticationLogsTableName = "authentication_logs"
 const configTableName = "config"
 
@@ -24,6 +25,7 @@ var sqlUpgradeCreateTableStatements = map[SchemaVersion]map[string]string{
 		identityVerificationTokensTableName: "CREATE TABLE %s (token VARCHAR(512))",
 		totpSecretsTableName:                "CREATE TABLE %s (username VARCHAR(100) PRIMARY KEY, secret VARCHAR(64))",
 		u2fDeviceHandlesTableName:           "CREATE TABLE %s (username VARCHAR(100) PRIMARY KEY, keyHandle TEXT, publicKey TEXT)",
+		duoDevicesTableName:                 "CREATE TABLE %s (username VARCHAR(100) PRIMARY KEY, device VARCHAR(32), method VARCHAR(16))",
 		authenticationLogsTableName:         "CREATE TABLE %s (username VARCHAR(100), successful BOOL, time INTEGER)",
 		configTableName:                     "CREATE TABLE %s (category VARCHAR(32) NOT NULL, key_name VARCHAR(32) NOT NULL, value TEXT, PRIMARY KEY (category, key_name))",
 	},

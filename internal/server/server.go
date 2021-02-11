@@ -119,8 +119,14 @@ func StartServer(configuration schema.Configuration, providers middlewares.Provi
 				configuration.DuoAPI.Hostname, ""))
 		}
 
+		r.GET("/api/secondfactor/duo_devices", autheliaMiddleware(
+			middlewares.RequireFirstFactor(handlers.SecondFactorDuoDevicesGet(duoAPI))))
+
 		r.POST("/api/secondfactor/duo", autheliaMiddleware(
 			middlewares.RequireFirstFactor(handlers.SecondFactorDuoPost(duoAPI))))
+
+		r.POST("/api/secondfactor/duo_device", autheliaMiddleware(
+			middlewares.RequireFirstFactor(handlers.SecondFactorDuoDevicePost)))
 	}
 
 	// If trace is set, enable pprofhandler and expvarhandler.

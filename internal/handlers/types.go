@@ -24,6 +24,9 @@ type UserInfo struct {
 
 	// True if a TOTP device has been registered.
 	HasTOTP bool `json:"has_totp" valid:"required"`
+
+	// True if a Duo device and method has been enrolled.
+	HasDuo bool `json:"has_duo" valid:"required"`
 }
 
 // signTOTPRequestBody model of the request body received by TOTP authentication endpoint.
@@ -40,6 +43,7 @@ type signU2FRequestBody struct {
 
 type signDuoRequestBody struct {
 	TargetURL string `json:"targetURL"`
+	Passcode  string `json:"passcode"`
 }
 
 // firstFactorBody represents the JSON body received by the endpoint.
@@ -62,6 +66,25 @@ type redirectResponse struct {
 type TOTPKeyResponse struct {
 	Base32Secret string `json:"base32_secret"`
 	OTPAuthURL   string `json:"otpauth_url"`
+}
+
+// DuoDeviceBody the selected Duo device and method.
+type DuoDeviceBody struct {
+	Device string `json:"device" valid:"required"`
+	Method string `json:"method" valid:"required"`
+}
+
+// DuoDevice represents Duo devices and methods
+type DuoDevice struct {
+	Device       string   `json:"device"`
+	DisplayName  string   `json:"display_name"`
+	Capabilities []string `json:"capabilities"`
+}
+
+// DuoDevicesResponse represents all available user devices and methods
+type DuoDevicesResponse struct {
+	Result  string      `json:"result" valid:"required"`
+	Devices []DuoDevice `json:"devices"`
 }
 
 // StateResponse represents the response sent by the state endpoint.
