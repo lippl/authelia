@@ -29,7 +29,7 @@ var sqlUpgradeCreateTableStatements = map[SchemaVersion]map[string]string{
 		configTableName:                     "CREATE TABLE %s (category VARCHAR(32) NOT NULL, key_name VARCHAR(32) NOT NULL, value TEXT, PRIMARY KEY (category, key_name))",
 	},
 	SchemaVersion(2): {
-		duoDevicesTableName:                 "CREATE TABLE %s (username VARCHAR(100) PRIMARY KEY, device VARCHAR(32), method VARCHAR(16))",
+		duoDevicesTableName: "CREATE TABLE %s (username VARCHAR(100) PRIMARY KEY, device VARCHAR(32), method VARCHAR(16))",
 	},
 }
 

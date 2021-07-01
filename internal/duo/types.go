@@ -21,7 +21,7 @@ type APIImpl struct {
 	*duoapi.DuoApi
 }
 
-// DuoDevice holds all necessary info for frontend
+// Device holds all necessary info for frontend.
 type Device struct {
 	Capabilities []string `json:"capabilities"`
 	Device       string   `json:"device"`
@@ -41,7 +41,7 @@ type Response struct {
 	Stat          string          `json:"stat"`
 }
 
-// AuthResponse is a response for a authorization request
+// AuthResponse is a response for a authorization request.
 type AuthResponse struct {
 	Result             string `json:"result"`
 	Status             string `json:"status"`
@@ -49,7 +49,7 @@ type AuthResponse struct {
 	TrustedDeviceToken string `json:"trusted_device_token"`
 }
 
-// PreauthResponse is a response for a preauthorization request
+// PreauthResponse is a response for a preauthorization request.
 type PreauthResponse struct {
 	Result          string   `json:"result"`
 	StatusMessage   string   `json:"status_msg"`

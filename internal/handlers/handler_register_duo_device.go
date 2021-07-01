@@ -19,41 +19,62 @@ func SecondFactorDuoDevicesGet(duoAPI duo.API) middlewares.RequestHandler {
 
 		ctx.Logger.Debugf("Starting Duo PreAuth for %s", userSession.Username)
 
-		result, message, devices, enrollUrl, err := DuoPreAuth(duoAPI, ctx)
+		result, message, devices, enrollURL, err := DuoPreAuth(duoAPI, ctx)
 		if err != nil {
 			ctx.Error(fmt.Errorf("Duo PreAuth API errored: %s", err), operationFailedMessage)
 			return
 		}
 
-		if result == "auth" {
+		if result == auth {
 			if devices == nil {
 				ctx.Logger.Debugf("No applicable device/method available for Duo user %s", userSession.Username)
-				ctx.SetJSONBody(DuoDevicesResponse{Result: "enroll"})
+
+				if err := ctx.SetJSONBody(DuoDevicesResponse{Result: "enroll"}); err != nil {
+					ctx.Error(fmt.Errorf("Unable to set JSON body in response"), operationFailedMessage)
+				}
+
 				return
 			}
-			ctx.SetJSONBody(DuoDevicesResponse{Result: result, Devices: devices})
+
+			if err := ctx.SetJSONBody(DuoDevicesResponse{Result: result, Devices: devices}); err != nil {
+				ctx.Error(fmt.Errorf("Unable to set JSON body in response"), operationFailedMessage)
+			}
+
 			return
 		}
-		if result == "allow" {
+
+		if result == allow {
 			ctx.Logger.Debugf("Device selection not possible for user %s, because Duo authentication was bypassed - Defaults to Auto Push", userSession.Username)
-			ctx.SetJSONBody(DuoDevicesResponse{Result: result})
+
+			if err := ctx.SetJSONBody(DuoDevicesResponse{Result: result}); err != nil {
+				ctx.Error(fmt.Errorf("Unable to set JSON body in response"), operationFailedMessage)
+			}
+
 			return
 		}
-		if result == "enroll" {
+
+		if result == enroll {
 			ctx.Logger.Debugf("Duo User not enrolled: %s", userSession.Username)
-			ctx.SetJSONBody(DuoDevicesResponse{Result: result, EnrollURL: enrollUrl})
+
+			if err := ctx.SetJSONBody(DuoDevicesResponse{Result: result, EnrollURL: enrollURL}); err != nil {
+				ctx.Error(fmt.Errorf("Unable to set JSON body in response"), operationFailedMessage)
+			}
+
 			return
 		}
-		if result == "deny" {
+
+		if result == deny {
 			ctx.Logger.Debugf("Duo User not allowed to authenticate: %s", userSession.Username)
-			ctx.SetJSONBody(DuoDevicesResponse{Result: result})
+
+			if err := ctx.SetJSONBody(DuoDevicesResponse{Result: result}); err != nil {
+				ctx.Error(fmt.Errorf("Unable to set JSON body in response"), operationFailedMessage)
+			}
+
 			return
 		}
 
 		ctx.Error(fmt.Errorf("Duo PreAuth API errored for %s: %s - %s", userSession.Username, result, message), operationFailedMessage)
-
 	}
-
 }
 
 // SecondFactorDuoDevicePost update the user preferences regarding Duo device and method.

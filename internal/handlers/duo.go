@@ -19,10 +19,12 @@ func DuoPreAuth(duoAPI duo.API, ctx *middlewares.AutheliaCtx) (string, string, [
 		return "", "", nil, "", err
 	}
 
-	if preauthResponse.Result == "auth" {
+	if preauthResponse.Result == auth {
 		var supportedDevices []DuoDevice
+
 		for _, device := range preauthResponse.Devices {
 			var supportedMethods []string
+
 			for _, method := range duo.PossibleMethods {
 				if utils.IsStringInSlice(method, device.Capabilities) {
 					supportedMethods = append(supportedMethods, method)
@@ -42,5 +44,6 @@ func DuoPreAuth(duoAPI duo.API, ctx *middlewares.AutheliaCtx) (string, string, [
 			return preauthResponse.Result, preauthResponse.StatusMessage, supportedDevices, preauthResponse.EnrollPortalURL, nil
 		}
 	}
+
 	return preauthResponse.Result, preauthResponse.StatusMessage, nil, preauthResponse.EnrollPortalURL, nil
 }

@@ -268,7 +268,9 @@ func (p *SQLProvider) SavePreferredDuoDevice(username string, device string, met
 // LoadPreferredDuoDevice load a Duo device and method given a username.
 func (p *SQLProvider) LoadPreferredDuoDevice(username string) (string, string, error) {
 	var device string
+
 	var method string
+
 	if err := p.db.QueryRow(p.sqlGetDuoDeviceByUsername, username).Scan(&device, &method); err != nil {
 		if err == sql.ErrNoRows {
 			return "", "", ErrNoDuoDevice

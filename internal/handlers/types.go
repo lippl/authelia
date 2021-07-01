@@ -92,7 +92,7 @@ type DuoDevicesResponse struct {
 // DuoSignResponse represents a result of the preauth and or auth call with further optional info.
 type DuoSignResponse struct {
 	Result    string      `json:"result" valid:"required"`
-	Devices   []DuoDevice `json:"devices,omitemptys"`
+	Devices   []DuoDevice `json:"devices,omitempty"`
 	Redirect  string      `json:"redirect,omitempty"`
 	EnrollURL string      `json:"enroll_url,omitempty"`
 }
