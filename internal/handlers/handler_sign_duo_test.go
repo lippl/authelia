@@ -33,7 +33,7 @@ func (s *SecondFactorDuoPostSuite) TearDownTest() {
 	s.mock.Close()
 }
 
-func (s *SecondFactorDuoPostSuite) TestShouldUseInvalidMethodAndFail() {
+func (s *SecondFactorDuoPostSuite) TestShouldUseInvalidMethodAndSelect() {
 	duoMock := mocks.NewMockAPI(s.mock.Ctrl)
 
 	s.mock.StorageProviderMock.EXPECT().LoadPreferredDuoDevice("john").Return("auto", "testfailure", nil)
@@ -43,8 +43,7 @@ func (s *SecondFactorDuoPostSuite) TestShouldUseInvalidMethodAndFail() {
 	s.mock.Ctx.Request.SetBody(bodyBytes)
 
 	SecondFactorDuoPost(duoMock)(s.mock.Ctx)
-
-	s.mock.Assert401KO(s.T(), "Authentication failed, please retry later.")
+	s.mock.Assert200OK(s.T(), DuoSignResponse{Result: auth})
 }
 
 func (s *SecondFactorDuoPostSuite) TestShouldCallDuoAPIAndAllowAccess() {

@@ -158,7 +158,7 @@ func (s *FetchSuite) TestShouldGetDefaultPreferenceIfNotInDB() {
 	s.mock.StorageProviderMock.
 		EXPECT().
 		LoadPreferredDuoDevice(gomock.Eq("john")).
-		Return("", "", storage.ErrNoDuoDevice.Error)
+		Return("", "", storage.ErrNoDuoDevice)
 
 	UserInfoGet(s.mock.Ctx)
 	s.mock.Assert200OK(s.T(), UserInfo{Method: "totp"})

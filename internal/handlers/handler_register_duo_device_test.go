@@ -41,7 +41,7 @@ func (s *RegisterDuoDeviceSuite) TestShouldCallDuoAPIAndFail() {
 	SecondFactorDuoDevicesGet(duoMock)(s.mock.Ctx)
 
 	s.mock.Assert200KO(s.T(), "Operation failed.")
-	assert.Equal(s.T(), "Duo API errored: Connnection error", s.mock.Hook.LastEntry().Message)
+	assert.Equal(s.T(), "Duo PreAuth API errored: Connnection error", s.mock.Hook.LastEntry().Message)
 	assert.Equal(s.T(), logrus.ErrorLevel, s.mock.Hook.LastEntry().Level)
 }
 
@@ -58,11 +58,7 @@ func (s *RegisterDuoDeviceSuite) TestShouldRespondWithDummyOnBypass() {
 
 	SecondFactorDuoDevicesGet(duoMock)(s.mock.Ctx)
 
-	s.mock.Assert200OK(s.T(), DuoDevicesResponse{Devices: []DuoDevice{{
-		Device:       "auto",
-		DisplayName:  "Auto Push (Duo authentication bypassed)",
-		Capabilities: []string{"push"},
-	}}})
+	s.mock.Assert200OK(s.T(), DuoDevicesResponse{Result: testResultAllow, Devices: nil})
 }
 
 func (s *RegisterDuoDeviceSuite) TestShouldRespondOK() {
